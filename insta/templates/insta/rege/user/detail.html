@@ -1,0 +1,110 @@
+{% extends "insta/base.html" %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-5 col-lg-offset-1">
+            <p>
+            	<img src="{{ user.profile.photo.url }}" class="img-circle" style="width: 200px; height: 200px; float: left; margin-top: 5px; margin-right: 20px;">
+                <h3>{{ user.get_full_name }}</h3>
+                <h4>@{{ user.username }}</h4>
+                {% with following=user.following.count followings=user.following.all %}
+                    <p><button class="btn" type="button" id="following" onclick="toggleFollowing()">{{ following }} Following</button>
+                    <script type="text/javascript">
+                            function toggleFollowing() {
+                                var x = document.getElementById('toggle');
+                                if (x.style.display === 'none') {
+                                    x.style.display = 'block';
+                                } else {
+                                    x.style.display = 'none';
+                                }
+                            }
+                    </script>
+                        <p id="toggle">
+                            {% for fllw in followings %}
+                                <a href='{% url "user_detail" username=fllw.username %}'>{{ fllw.username }}</a> |  
+                            {% endfor %}
+                        </p>
+                    </p>
+                {% endwith %}
+                {% with total_followers=user.followers.count follower=user.followers.all %}
+                    <div class="image-info">
+                        <div>
+                            <p>
+                                <button class="btn" type="button" id="following" onclick="toggleFollower()">
+                                    <span class="count">
+                                        <span class="total">{{ total_followers }}</span>
+                                        Follower{{ total_followers|pluralize }}
+                                    </span>
+                                </button>
+                                <a href="#" data-id="{{ user.id }}" data-action="{% if request.user in user.followers.all %}un{% endif %}follow" class="follow button">
+                                    {% if request.user not in user.followers.all %}
+                                        Follow
+                                    {% else %}
+                                        Unfollow
+                                    {% endif %}
+                                </a>
+                            </p>
+                            <script type="text/javascript">
+                                function toggleFollower() {
+                                    var y = document.getElementById('toggleFollow');
+                                    if (y.style.display === 'none') {
+                                        y.style.display = 'block';
+                                    } else {
+                                        y.style.display = 'none';
+                                    }
+                                }
+                            </script>                            
+                            <p id="toggleFollow">
+                                {% for fllwr in follower %}
+                                    <a href='{% url "user_detail" username=fllwr.username %}'>{{ fllwr.username }}</a> |   
+                                {% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                {% endwith %}
+            </p>
+        </div>
+    </div>
+    <hr />
+    <div class="container">
+        <div class="row">
+        {% for image in images %}
+            <div class="col-lg-3 thumb" style="margin-bottom: 30px;">
+                <a class="thumbnail" href="{{ image.get_absolute_url }}" style="border: 1px;">
+                    <img class="img-responsive" src="{{ image.image.url }}" style="height: 250px;">
+                </a>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block domready %}
+    $('a.follow').click(function(e){
+        e.preventDefault();
+        $.post('{% url "user_follow" %}',
+            {
+                id: $(this).data('id'),
+                action: $(this).data('action')
+            },
+            function(data){
+                if (data['status'] == 'ok')
+                {
+                    var previous_action = $('a.follow').data('action');
+
+                    // toggle data-action
+                    $('a.follow').data('action', previous_action == 'follow' ? 'unfollow' : 'follow');
+                    // toggle link text
+                    $('a.follow').text(previous_action == 'follow' ? 'Unfollow' : 'Follow');
+
+                    // update total followers
+                    var previous_followers = parseInt($('span.count .total').text());
+                    $('span.count .total').text(previous_action == 'follow' ? previous_followers + 1 : previous_followers - 1);
+                }
+        });
+        $("#toggleFollow").load(location.href + " #toggleFollow");
+    });
+{% endblock %}
