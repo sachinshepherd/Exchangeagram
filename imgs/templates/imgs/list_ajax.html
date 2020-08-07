@@ -1,0 +1,28 @@
+{% extends "insta/base.html" %}
+
+{% block title %}Feed{% endblock %}
+
+{% block content %}
+    {% for image in images %}
+        <div class="row">
+            <div class="col-lg-5 col-lg-offset-3">
+                <div class="thumbnail" style="width: 100%;  border: 1px;">
+                    <a href="{{ image.get_absolute_url }}">
+                        <img src="{{ image.image.url }}" class="img-responsive" style="width: 100%;">
+                    </a>
+                    <div class="caption">
+                        <p>
+                            <img src="{{ image.user.profile.photo.url }}" class="img-circle" style="width: 40px; height: 40px; float: left; margin-top: 5px; margin-right: 5px;">
+                            <h4>@{{ image.user.username }} <small>{{ image.created }}</small></h4>
+                            <a href="{{ image.get_absolute_url }}" style="line-height: 0px">
+                                {% with total_likes=image.users_like.count %}
+                                    <p>Like{{ total_likes|pluralize }}: {{ total_likes }}</p>
+                                {% endwith %}
+                            </a>
+                        </p>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

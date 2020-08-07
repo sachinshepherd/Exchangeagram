@@ -1,0 +1,5 @@
+Django==1.11.10
+django-crispy-forms==1.7.0
+Pillow==5.0.0
+pytz==2018.3
+virtualenv==15.1.0

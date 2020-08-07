@@ -1,0 +1,16 @@
+{% extends 'insta/base.html' %}
+
+{% block title %}Upload an image{% endblock %}
+
+{% block content %}
+	<div class="row">
+	<div class="col-lg-4 col-lg-offset-4 img-thumbnail" style="border: 1px;">
+	<h1>Upload an image</h1>
+	<form action="." method="post" enctype="multipart/form-data">
+		{{ form.as_p }}
+		{% csrf_token %}
+		<input type="submit" value="Upload" class="btn">
+	</form>
+	</div>
+	</div>
+{% endblock %}

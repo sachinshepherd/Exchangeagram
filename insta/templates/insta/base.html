@@ -1,0 +1,91 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <style>
+        .gra{
+            background: radial-gradient(circle at 33% 100%, #FED373 4%, #F15245 40%, #D92E7F 62%);
+        }
+    </style>
+  </head>
+  <body>
+      {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">×</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src=" http://cdn.jsdelivr.net/jquery.cookie/1.4.1/jquery.cookie.min.js "></script>
+    <script>
+        var csrftoken = $.cookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function(){
+            {% block domready %}
+            {% endblock %}
+		});
+    </script>
+
+    <nav class="navbar navbar-default navbar-fixed-top gra">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <img src={% static "insta.png" %} style="float:left; height: 50px; width: 50px;">
+                <a class="navbar-brand" href="{% url "images:list" %}"><strong><font color="black" style="font-size: 25px;">Exchangeagram</font></strong></a>
+
+            </div>
+
+            <div class="collapse navbar-collapse">
+                {% if request.user.is_authenticated %}
+                    <form class="navbar-form navbar-left" method="GET" action="">
+                       <!--  <div class="form-group">
+                          <input type="text" name='q' class="form-control" placeholder="Search" value='{{request.GET.q}}'>
+                        </div> -->
+                        <!-- <input type="submit" value="Search" class="btn btn-primary" /> -->
+                    </form>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li {% if section == "dashboard" %}class="active"{% endif %}><a href="{% url "dashboard" %}"><font color="black">Profile</font></a></li>
+                        <li {% if section == "images" %}class="active"{% endif %}><a href="{% url "images:list" %}"><font color="black">Home</font></a></li>
+                        <li {% if section == "upload" %}class="active"{% endif %}><a href="{% url "images:upload" %}"><font color="black">Upload</font></a></li>
+                        <li {% if section == "people" %}class="active"{% endif %}><a href="{% url "user_list" %}"><font color="black">Users</font></a></li>
+                        <li {% if section == "people" %}class="selected"{% endif %}>
+                            {% if request.user.is_authenticated %}
+                                <a href="{% url "logout" %}"><font color="black">Logout</font></a>
+                            {% else %}
+                                <a href="{% url "login" %}"><font color="black">Login</font></a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div id="content" style="margin-top: 100px;">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
+  </body>
+</html>

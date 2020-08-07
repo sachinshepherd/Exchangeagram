@@ -1,0 +1,31 @@
+{% extends "insta/base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-lg-4 col-lg-offset-4">
+            <p>
+                <img src='{% if user.profile.photo %}{{ user.profile.photo.url }}{% else %}{% static "img/no_image.png" %}{% endif %}' class="img-thumbnail img-circle " style="width: 200px; height: 200px; float: left; margin-top: 5px; margin-right: 20px;">
+                <h3>{{ user.get_full_name }}</h3>
+                <h4>@{{ user.username }}</h4>
+                {% with followers=user.followers.count following=user.following.count %}
+                	<p>{{ followers }} Follower{{ followers|pluralize }} | {{ following }} Following</p>
+                {% endwith %}
+                <a href='{% url "edit" %}'>Edit profile</a>
+            </p>
+		</div>
+	</div>
+	<hr />
+	<div class="container">
+	    <div class="row">
+	    {% for image in images %}
+	        <div class="col-lg-3 thumb table-inverse" style="margin-bottom: 30px;">
+	            <a class="img-thumbnail" href="{{ image.get_absolute_url }}" style="border: 1px;">
+	                <img class="img-responsive" src="{{ image.image.url }}" style="height: 250px;">
+	            </a>
+	        </div>
+	    {% endfor %}
+		</div>
+	</div>
+{% endblock %}
